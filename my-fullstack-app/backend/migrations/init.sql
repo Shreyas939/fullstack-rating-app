@@ -1,0 +1,47 @@
+-- Roles table
+CREATE TABLE IF NOT EXISTS roles (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- Insert default roles
+INSERT INTO roles (name) VALUES ('system_admin') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('normal_user') ON CONFLICT DO NOTHING;
+INSERT INTO roles (name) VALUES ('store_owner') ON CONFLICT DO NOTHING;
+
+-- Users table
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(60) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  address VARCHAR(400),
+  password_hash VARCHAR(255) NOT NULL,
+  role_id INTEGER NOT NULL REFERENCES roles(id),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Stores table
+CREATE TABLE IF NOT EXISTS stores (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255),
+  address VARCHAR(400),
+  owner_id INTEGER REFERENCES users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Ratings table
+CREATE TABLE IF NOT EXISTS ratings (
+  id SERIAL PRIMARY KEY,
+  store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  rating SMALLINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (store_id, user_id)
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_ratings_store ON ratings(store_id);
+CREATE INDEX IF NOT EXISTS idx_ratings_user ON ratings(user_id);
+
+
