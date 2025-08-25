@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import {ApiError} from "../utils/ApiError.js";
+import { ApiError } from "../utils/ApiError.js";
 
 const authMiddleware = (roles = []) => {
   return (req, res, next) => {
@@ -15,9 +15,8 @@ const authMiddleware = (roles = []) => {
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded; // { id, role }
+      req.user = decoded; 
 
-      // Role-based check
       if (roles.length > 0 && !roles.includes(decoded.role)) {
         throw new ApiError(403, "Forbidden: insufficient permissions");
       }

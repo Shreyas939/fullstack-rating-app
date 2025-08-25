@@ -7,7 +7,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// List stores with filtering, sorting, average rating, user’s rating
+// filtering on stores
 router.get(
   "/",
   authMiddleware(), // any authenticated user
@@ -20,11 +20,12 @@ router.get(
     const sortBy = allowedSortFields.includes(sort) ? sort : "name";
     const sortDir = allowedDirections.includes(dir.toLowerCase()) ? dir.toUpperCase() : "ASC";
 
-    // Base SQL with left join for average rating
     let sql = `
-      SELECT s.id, s.name, s.email, s.address,
-        COALESCE(ROUND(AVG(r.rating), 2), 0) AS average_rating
+      SELECT s.id, s.name, s.email, s.address, s.owner_id,
+             u.name AS owner_name, u.email AS owner_email,
+             COALESCE(ROUND(AVG(r.rating), 2), 0) AS average_rating
       FROM stores s
+      LEFT JOIN users u ON s.owner_id = u.id
       LEFT JOIN ratings r ON s.id = r.store_id
     `;
 
@@ -43,12 +44,11 @@ router.get(
       sql += ` WHERE ` + filters.join(" AND ");
     }
 
-    sql += ` GROUP BY s.id ORDER BY s.${sortBy} ${sortDir}`;
+    sql += ` GROUP BY s.id, u.name, u.email ORDER BY s.${sortBy} ${sortDir}`;
 
     const storesRes = await db.query(sql, params);
 
-    // Fetch user's rating for those stores
-    const storeIds = storesRes.rows.map(store => store.id);
+    const storeIds = storesRes.rows.map((store) => store.id);
     let userRatings = [];
     if (storeIds.length > 0) {
       const ratingsRes = await db.query(
@@ -58,9 +58,8 @@ router.get(
       userRatings = ratingsRes.rows;
     }
 
-    // Add user rating to store object
-    const storesWithUserRating = storesRes.rows.map(store => {
-      const userRatingObj = userRatings.find(ur => ur.store_id === store.id);
+    const storesWithUserRating = storesRes.rows.map((store) => {
+      const userRatingObj = userRatings.find((ur) => ur.store_id === store.id);
       return {
         ...store,
         user_rating: userRatingObj ? userRatingObj.rating : null,
@@ -71,7 +70,7 @@ router.get(
   })
 );
 
-// Admin-only store creation with optional validated owner_id
+// store creation only for admin
 router.post(
   "/",
   authMiddleware([1]), // system_admin only
@@ -82,7 +81,6 @@ router.post(
       throw new ApiError(400, "Store name is required");
     }
 
-    // Validate owner_id if provided
     if (owner_id) {
       const ownerRes = await db.query(
         "SELECT id FROM users WHERE id = $1 AND role_id = 3", // 3 = store_owner role

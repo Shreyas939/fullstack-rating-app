@@ -12,10 +12,12 @@ import storeOwnerRoutes from "./routes/storeOwner.js";
 dotenv.config();
 
 const app = express();
-app.use(cors({
-  origin: "http://localhost:5173",  // your React app
-  credentials: true                 // allow cookies/headers if needed
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173", 
+    credentials: true, 
+  })
+);
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -24,9 +26,9 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use(errorHandler);
-app.use("/api/stores",storesRoutes);
-app.use("/api/ratings",ratingRoutes);
-app.use("/api/admin",adminRoutes)
+app.use("/api/stores", storesRoutes);
+app.use("/api/ratings", ratingRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/store-owner", storeOwnerRoutes);
 
 const PORT = process.env.PORT || 4000;

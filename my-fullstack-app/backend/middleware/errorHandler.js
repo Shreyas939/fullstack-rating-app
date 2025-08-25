@@ -1,7 +1,7 @@
-import {ApiError} from "../utils/ApiError.js";
+import { ApiError } from "../utils/ApiError.js";
 
 const errorHandler = (err, req, res, next) => {
-  console.error(err); // keep logging in server console
+  console.error(err);
 
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({

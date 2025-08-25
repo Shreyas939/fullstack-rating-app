@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"; // 👈 import icons
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"; 
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ export default function SignupPage() {
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👈 state for toggle
+  const [showPassword, setShowPassword] = useState(false); //  state for toggle
 
   const validate = () => {
     const errs = {};
@@ -29,10 +29,7 @@ export default function SignupPage() {
     if (form.address && form.address.length > 400) {
       errs.address = "Address must not exceed 400 characters.";
     }
-    if (
-      !form.password ||
-      !/^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,16}$/.test(form.password)
-    ) {
+    if (!form.password || !/^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,16}$/.test(form.password)) {
       errs.password =
         "Password must be 8-16 characters, include 1 uppercase letter and 1 special character.";
     }
@@ -61,9 +58,7 @@ export default function SignupPage() {
       alert("Signup successful! Please login.");
       navigate("/login");
     } catch (error) {
-      setApiError(
-        error.response?.data?.message || "Signup failed, please try again."
-      );
+      setApiError(error.response?.data?.message || "Signup failed, please try again.");
     } finally {
       setLoading(false);
     }
@@ -72,14 +67,10 @@ export default function SignupPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="w-full max-w-md p-8 bg-white shadow-md rounded-xl">
-        <h2 className="mb-6 text-3xl font-semibold text-center text-gray-800">
-          SignUp
-        </h2>
+        <h2 className="mb-6 text-3xl font-semibold text-center text-gray-800">SignUp</h2>
 
         {apiError && (
-          <div className="p-2 mb-4 text-sm text-red-700 bg-red-100 rounded-md">
-            {apiError}
-          </div>
+          <div className="p-2 mb-4 text-sm text-red-700 bg-red-100 rounded-md">{apiError}</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
@@ -111,9 +102,7 @@ export default function SignupPage() {
                 : "border-gray-300 focus:ring-blue-400"
             }`}
           />
-          {errors.email && (
-            <p className="text-sm text-red-500">{errors.email}</p>
-          )}
+          {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
 
           <textarea
             id="address"
@@ -128,9 +117,7 @@ export default function SignupPage() {
             }`}
             rows="3"
           />
-          {errors.address && (
-            <p className="text-sm text-red-500">{errors.address}</p>
-          )}
+          {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
 
           {/* Password with toggle */}
           <div className="relative">
@@ -163,9 +150,7 @@ export default function SignupPage() {
               )}
             </div>
           </div>
-          {errors.password && (
-            <p className="text-sm text-red-500">{errors.password}</p>
-          )}
+          {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
 
           <button
             type="submit"

@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -37,7 +36,6 @@ export function AuthProvider({ children }) {
     }
   }, [user, accessToken, refreshToken]);
 
-  // login function called by LoginPage after successful API call
   const login = (nextUser, at, rt) => {
     setUser(nextUser);
     setAccessToken(at);
@@ -54,14 +52,17 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("refreshToken");
   };
 
-  const value = useMemo(() => ({
-    user,
-    accessToken,
-    refreshToken,
-    login,
-    logout,
-    loading,
-  }), [user, accessToken, refreshToken, loading]);
+  const value = useMemo(
+    () => ({
+      user,
+      accessToken,
+      refreshToken,
+      login,
+      logout,
+      loading,
+    }),
+    [user, accessToken, refreshToken, loading]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

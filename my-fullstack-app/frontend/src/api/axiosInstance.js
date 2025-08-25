@@ -1,10 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:4000/api", // backend base URL
+  baseURL: "http://localhost:4000/api",
 });
 
-// 🔹 Attach access token to every request
+// attaching token to each request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
   if (token) {
@@ -13,7 +13,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 🔹 Refresh token logic when 401 happens
+// refresh token when 401 happens
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -26,7 +26,6 @@ api.interceptors.response.use(
         const refreshToken = localStorage.getItem("refreshToken");
         if (!refreshToken) throw new Error("No refresh token");
 
-        // Call backend refresh endpoint
         const { data } = await axios.post("http://localhost:4000/api/auth/refresh", {
           refreshToken,
         });
@@ -36,7 +35,6 @@ api.interceptors.response.use(
         // Save new token
         localStorage.setItem("accessToken", newAccessToken);
 
-        // Update axios headers
         api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
@@ -45,7 +43,6 @@ api.interceptors.response.use(
       } catch (err) {
         console.error("❌ Refresh token failed:", err);
 
-        // Clear tokens & force re-login
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         window.location.href = "/login";

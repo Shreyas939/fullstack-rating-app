@@ -1,15 +1,12 @@
--- Roles table
 CREATE TABLE IF NOT EXISTS roles (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50) UNIQUE NOT NULL
 );
 
--- Insert default roles
 INSERT INTO roles (name) VALUES ('system_admin') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('normal_user') ON CONFLICT DO NOTHING;
 INSERT INTO roles (name) VALUES ('store_owner') ON CONFLICT DO NOTHING;
 
--- Users table
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(60) NOT NULL,
@@ -20,7 +17,6 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Stores table
 CREATE TABLE IF NOT EXISTS stores (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -30,7 +26,6 @@ CREATE TABLE IF NOT EXISTS stores (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Ratings table
 CREATE TABLE IF NOT EXISTS ratings (
   id SERIAL PRIMARY KEY,
   store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
@@ -40,7 +35,6 @@ CREATE TABLE IF NOT EXISTS ratings (
   UNIQUE (store_id, user_id)
 );
 
--- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_ratings_store ON ratings(store_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_user ON ratings(user_id);
 

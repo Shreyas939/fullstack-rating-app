@@ -1,16 +1,11 @@
 import express from "express";
 import db from "../db.js";
-import {asyncHandler} from "../utils/asyncHandler.js";
-import {ApiResponse} from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-/**
- * POST /api/ratings/:storeId
- * Body: { rating, comment }
- * Requires: logged-in user
- */
 router.post(
   "/:storeId",
   authMiddleware(),
@@ -20,12 +15,10 @@ router.post(
     const userId = req.user.id;
 
     if (!rating || rating < 1 || rating > 5) {
-      return res
-        .status(400)
-        .json(new ApiResponse(400, null, "Rating must be between 1 and 5"));
+      return res.status(400).json(new ApiResponse(400, null, "Rating must be between 1 and 5"));
     }
 
-    // ✅ UPSERT: if a rating exists, update it; else insert new
+    // updating ratings
     const result = await db.query(
       `INSERT INTO ratings (store_id, user_id, rating)
        VALUES ($1, $2, $3)
@@ -35,16 +28,10 @@ router.post(
       [storeId, userId, rating]
     );
 
-    return res
-      .status(201)
-      .json(new ApiResponse(201, result.rows[0], "Rating saved/updated"));
+    return res.status(201).json(new ApiResponse(201, result.rows[0], "Rating saved/updated"));
   })
 );
 
-/**
- * GET /api/ratings/:storeId
- * Returns average rating + all reviews
- */
 router.get(
   "/:storeId",
   asyncHandler(async (req, res) => {
@@ -65,19 +52,18 @@ router.get(
     );
 
     return res.json(
-      new ApiResponse(200, {
-        average: avgRes.rows[0],
-        reviews: reviewsRes.rows,
-      },
-      "Ratings fetched")
+      new ApiResponse(
+        200,
+        {
+          average: avgRes.rows[0],
+          reviews: reviewsRes.rows,
+        },
+        "Ratings fetched"
+      )
     );
   })
 );
 
-
-/**
- * POST or UPDATE rating for a store
- */
 router.post(
   "/:storeId",
   authMiddleware(),
@@ -87,12 +73,9 @@ router.post(
     const userId = req.user.id;
 
     if (!rating || rating < 1 || rating > 5) {
-      return res
-        .status(400)
-        .json(new ApiResponse(400, null, "Rating must be between 1 and 5"));
+      return res.status(400).json(new ApiResponse(400, null, "Rating must be between 1 and 5"));
     }
 
-    // Upsert: if exists → update, else → insert
     const result = await db.query(
       `INSERT INTO ratings (store_id, user_id, rating)
        VALUES ($1, $2, $3)
@@ -102,11 +85,8 @@ router.post(
       [storeId, userId, rating]
     );
 
-    return res
-      .status(201)
-      .json(new ApiResponse(201, result.rows[0], "Rating saved/updated"));
+    return res.status(201).json(new ApiResponse(201, result.rows[0], "Rating saved/updated"));
   })
 );
-
 
 export default router;

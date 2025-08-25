@@ -1,7 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -10,7 +11,19 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate();
+  const { user, login } = useAuth();
+
+  // redirect if already logged in
+  if (user) {
+    const redirectTo =
+      user.role === "system_admin"
+        ? "/admin"
+        : user.role === "store_owner"
+          ? "/store-owner"
+          : "/stores";
+
+    return <Navigate to={redirectTo} replace />;
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,30 +36,27 @@ export default function LoginPage() {
         password,
       });
 
-      console.log("🔵 Backend login response:", response.data);
+      const { accessToken, refreshToken, user: userData } = response.data.data;
 
-      const { accessToken, refreshToken, user } = response.data.data;
-
-      // ✅ Save both tokens
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-
-      // ✅ set axios default header so further requests carry token
       axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
-      // ✅ navigate based on role
-      const roleRoutes = {
-        system_admin: "/admin",
-        store_owner: "/store-owner",
-        normal_user: "/stores", // or "customer" depending on your DB
+      // Map role_id → role string
+      const roleMap = {
+        1: "system_admin",
+        2: "normal_user",
+        3: "store_owner",
       };
+      const normalizedRole = roleMap[userData.role_id] || "normal_user";
 
-      const normalizedRole =
-        user.role_id?.toString().toLowerCase().replace(" ", "_") || "normal_user";
+      console.log("Backend user role_id:", userData.role_id);
+      console.log("Normalized role:", normalizedRole);
 
-      navigate(roleRoutes[normalizedRole] || "/stores");
+      const normalizedUser = { ...userData, role: normalizedRole };
+
+      // Update auth context
+      login(normalizedUser, accessToken, refreshToken);
+
     } catch (err) {
-      console.error("❌ Login failed:", err.response?.data || err.message);
       setError(err.response?.data?.message || "Login failed, please try again.");
     } finally {
       setLoading(false);
@@ -56,9 +66,7 @@ export default function LoginPage() {
   return (
     <div className="flex items-center justify-center min-h-screen px-4 bg-gray-50">
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-2xl">
-        <h2 className="mb-6 text-3xl font-semibold text-center text-gray-800">
-          Login
-        </h2>
+        <h2 className="mb-6 text-3xl font-semibold text-center text-gray-800">Login</h2>
 
         {error && (
           <div className="px-4 py-2 mb-4 text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg">
@@ -67,7 +75,6 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleLogin} className="space-y-5">
-          {/* Email */}
           <input
             type="email"
             value={email}
@@ -77,7 +84,6 @@ export default function LoginPage() {
             required
           />
 
-          {/* Password with toggle */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -92,15 +98,10 @@ export default function LoginPage() {
               className="absolute inset-y-0 flex items-center text-gray-500 right-3 hover:text-gray-700"
               onClick={() => setShowPassword((prev) => !prev)}
             >
-              {showPassword ? (
-                <FaRegEye size={20} />
-              ) : (
-                <FaRegEyeSlash size={20} />
-              )}
+              {showPassword ? <FaRegEye size={20} /> : <FaRegEyeSlash size={20} />}
             </button>
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -110,13 +111,9 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Footer */}
         <p className="mt-6 text-center text-gray-600">
           Not registered yet?{" "}
-          <Link
-            to="/signup"
-            className="font-medium text-blue-600 cursor-pointer hover:underline"
-          >
+          <Link to="/signup" className="font-medium text-blue-600 cursor-pointer hover:underline">
             Create an Account
           </Link>
         </p>

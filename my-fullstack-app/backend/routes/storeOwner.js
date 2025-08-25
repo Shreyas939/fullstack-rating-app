@@ -6,18 +6,13 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Get list of users who rated the store owned by current store owner
 router.get(
   "/ratings",
-  authMiddleware([3]), // store_owner role
+  authMiddleware([3]), // store_owner 
   asyncHandler(async (req, res) => {
     const storeOwnerId = req.user.id;
 
-    // Find stores owned by the user
-    const storesRes = await db.query(
-      "SELECT id FROM stores WHERE owner_id = $1",
-      [storeOwnerId]
-    );
+    const storesRes = await db.query("SELECT id FROM stores WHERE owner_id = $1", [storeOwnerId]);
 
     if (!storesRes.rows.length) {
       return res.json(new ApiResponse(200, [], "No stores found"));
@@ -34,23 +29,17 @@ router.get(
       [storeIds]
     );
 
-    return res.json(
-      new ApiResponse(200, ratingsRes.rows, "Users who rated your store")
-    );
+    return res.json(new ApiResponse(200, ratingsRes.rows, "Users who rated your store"));
   })
 );
 
-// Get average rating of store(s) owned by current store owner
 router.get(
   "/average-rating",
   authMiddleware([3]),
   asyncHandler(async (req, res) => {
     const storeOwnerId = req.user.id;
 
-    const storesRes = await db.query(
-      "SELECT id FROM stores WHERE owner_id = $1",
-      [storeOwnerId]
-    );
+    const storesRes = await db.query("SELECT id FROM stores WHERE owner_id = $1", [storeOwnerId]);
 
     if (!storesRes.rows.length) {
       return res.json(new ApiResponse(200, null, "No stores found"));
@@ -65,9 +54,7 @@ router.get(
       [storeIds]
     );
 
-    return res.json(
-      new ApiResponse(200, avgRatingRes.rows[0], "Average store rating")
-    );
+    return res.json(new ApiResponse(200, avgRatingRes.rows[0], "Average store rating"));
   })
 );
 
