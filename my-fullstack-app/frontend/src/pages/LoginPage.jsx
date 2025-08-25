@@ -58,6 +58,7 @@ export default function LoginPage() {
       login(normalizedUser, accessToken, refreshToken);
 
     } catch (err) {
+      console.log(err,backend_Url);
       setError(err.response?.data?.message || "Login failed, please try again.");
     } finally {
       setLoading(false);
