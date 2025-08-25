@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import UserProfileMenu from "./UserProfileMenu";
+import { backend_Url } from "../constants/env";
 
 export default function StoreOwnerDashboard() {
   const { accessToken, logout } = useAuth();
@@ -21,7 +22,7 @@ export default function StoreOwnerDashboard() {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.get("http://localhost:4000/api/store-owner/ratings", {
+      const response = await axios.get(`${backend_Url}/api/store-owner/ratings`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setRatings(response.data.data);

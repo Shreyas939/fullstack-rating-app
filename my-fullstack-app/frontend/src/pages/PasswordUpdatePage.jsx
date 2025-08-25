@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { backend_Url } from "../constants/env";
 
 export default function PasswordUpdatePage() {
   const { accessToken } = useAuth();
@@ -46,7 +47,7 @@ export default function PasswordUpdatePage() {
 
     try {
       await axios.put(
-        "http://localhost:4000/api/auth/update-password",
+        `${backend_Url}/api/auth/update-password`,
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );

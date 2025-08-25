@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link, Navigate } from "react-router-dom";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+import { backend_Url } from "../constants/env";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -31,7 +32,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:4000/api/auth/login", {
+      const response = await axios.post(`${backend_Url}/api/auth/login`, {
         email,
         password,
       });

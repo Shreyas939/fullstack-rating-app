@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { backend_Url } from "../constants/env";
 
 export default function AdminAddUserPage() {
   const { accessToken } = useAuth();
@@ -53,7 +54,7 @@ export default function AdminAddUserPage() {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:4000/api/admin/users", form, {
+      await axios.post(`${backend_Url}/api/admin/users`, form, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setSuccess("User added successfully!");

@@ -1,7 +1,8 @@
 import axios from "axios";
+import { backend_Url } from "../constants/env";
 
 const api = axios.create({
-  baseURL: "http://localhost:4000/api",
+  baseURL: `${backend_Url}/api`,
 });
 
 // attaching token to each request
@@ -26,7 +27,7 @@ api.interceptors.response.use(
         const refreshToken = localStorage.getItem("refreshToken");
         if (!refreshToken) throw new Error("No refresh token");
 
-        const { data } = await axios.post("http://localhost:4000/api/auth/refresh", {
+        const { data } = await axios.post(`${backend_Url}/api/auth/refresh`, {
           refreshToken,
         });
 
@@ -41,7 +42,7 @@ api.interceptors.response.use(
         // Retry the failed request
         return api(originalRequest);
       } catch (err) {
-        console.error("❌ Refresh token failed:", err);
+        console.error("Refresh token failed:", err);
 
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");

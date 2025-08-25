@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import UserProfileMenu from "./UserProfileMenu";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai"; 
+import { backend_Url } from "../constants/env";
 
 export default function StoreListPage() {
   const { accessToken, logout } = useAuth();
@@ -31,7 +32,7 @@ export default function StoreListPage() {
       if (search.name) params.name = search.name;
       if (search.address) params.address = search.address;
 
-      const res = await axios.get("http://localhost:4000/api/stores", {
+      const res = await axios.get(`${backend_Url}/api/stores`, {
         params,
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -65,7 +66,7 @@ export default function StoreListPage() {
 
     try {
       await axios.post(
-        `http://localhost:4000/api/ratings/${storeId}`,
+        `${backend_Url}/api/ratings/${storeId}`,
         { rating },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { backend_Url } from "../constants/env";
 
 export default function AdminAddStorePage() {
   const { accessToken } = useAuth();
@@ -28,7 +29,7 @@ export default function AdminAddStorePage() {
   useEffect(() => {
     async function fetchOwners() {
       try {
-        const res = await axios.get("http://localhost:4000/api/admin/users", {
+        const res = await axios.get(`${backend_Url}/api/admin/users`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const users = res.data.data || res.data.users || [];
@@ -49,7 +50,7 @@ export default function AdminAddStorePage() {
     try {
       const params = { sort: sortField, dir: sortOrder };
       if (search) params.name = search;
-      const res = await axios.get("http://localhost:4000/api/stores", {
+      const res = await axios.get(`${backend_Url}/api/stores`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         params,
       });
@@ -87,7 +88,7 @@ export default function AdminAddStorePage() {
     }
     setLoading(true);
     try {
-      await axios.post("http://localhost:4000/api/stores", form, {
+      await axios.post(`${backend_Url}/api/stores`, form, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setSuccess("Store added successfully!");

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"; 
+import { backend_Url } from "../constants/env";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:4000/api/auth/signup", form);
+      await axios.post(`${backend_Url}/api/auth/signup`, form);
       alert("Signup successful! Please login.");
       navigate("/login");
     } catch (error) {

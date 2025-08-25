@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import UserProfileMenu from "./UserProfileMenu";
+import { backend_Url } from "../constants/env";
 
 export default function AdminDashboard() {
   const { accessToken, logout } = useAuth();
@@ -23,7 +24,7 @@ export default function AdminDashboard() {
     }
 
     try {
-      const response = await axios.get("http://localhost:4000/api/admin/dashboard", {
+      const response = await axios.get(`${backend_Url}/api/admin/dashboard`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setStats(response.data.data);

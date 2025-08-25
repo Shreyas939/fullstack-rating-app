@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { backend_Url } from "../constants/env";
 
 export default function AdminUserListPage() {
   const { accessToken } = useAuth();
@@ -34,7 +35,7 @@ export default function AdminUserListPage() {
         if (params[key] === "") delete params[key];
       });
 
-      const res = await axios.get("http://localhost:4000/api/admin/users", {
+      const res = await axios.get(`${backend_Url}/api/admin/users`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         params,
       });
